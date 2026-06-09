@@ -1,0 +1,304 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Kairós editorial tokens — same system shared with the platform. */
+    --ink: oklch(0.14 0.006 60);
+    --ink-soft: oklch(0.22 0.006 60);
+    --paper: oklch(0.975 0.003 85);
+    --paper-warm: oklch(0.955 0.008 82);
+    --paper-surface: oklch(0.99 0.002 85);
+    --line: oklch(0.86 0.008 80);
+    --line-soft: oklch(0.91 0.006 80);
+    --mute: oklch(0.55 0.008 70);
+    --gold: oklch(0.78 0.09 85);
+    --gold-soft: oklch(0.86 0.05 85);
+    --gold-dark: oklch(0.58 0.09 85);
+    --espresso: oklch(0.22 0.015 50);
+    --brown: oklch(0.38 0.025 55);
+    --radius: 0.875rem;
+
+    --background: 40 20% 96%;
+    --foreground: 30 8% 14%;
+    --primary: 30 8% 14%;
+    --primary-foreground: 40 20% 96%;
+    --secondary: 40 14% 92%;
+    --secondary-foreground: 30 8% 14%;
+    --muted: 40 14% 92%;
+    --muted-foreground: 35 5% 45%;
+    --accent: 40 40% 62%;
+    --accent-foreground: 30 8% 14%;
+    --border: 40 12% 82%;
+    --input: 40 14% 90%;
+    --ring: 40 40% 62%;
+
+    --kairos-cream: oklch(0.975 0.003 85);
+    --kairos-pearl: oklch(0.955 0.008 82);
+    --kairos-gold: oklch(0.78 0.09 85);
+    --kairos-gold-light: oklch(0.86 0.05 85);
+    --kairos-gold-dark: oklch(0.58 0.09 85);
+    --kairos-charcoal: oklch(0.14 0.006 60);
+    --kairos-stone: oklch(0.55 0.008 70);
+  }
+
+  .dark, .theme-dark {
+    --ink: oklch(0.95 0.006 82);
+    --ink-soft: oklch(0.82 0.008 75);
+    --paper: oklch(0.22 0.015 50);
+    --paper-warm: oklch(0.25 0.015 50);
+    --paper-surface: oklch(0.28 0.018 52);
+    --line: oklch(0.3 0.014 52);
+    --line-soft: oklch(0.27 0.014 52);
+    --mute: oklch(0.62 0.01 60);
+
+    --background: 30 10% 18%;
+    --foreground: 40 8% 94%;
+    --primary: 40 8% 94%;
+    --primary-foreground: 30 10% 12%;
+    --secondary: 30 10% 26%;
+    --secondary-foreground: 40 8% 94%;
+    --muted: 30 10% 26%;
+    --muted-foreground: 35 6% 65%;
+    --accent: 40 40% 62%;
+    --accent-foreground: 30 10% 12%;
+    --border: 30 10% 30%;
+    --input: 30 10% 28%;
+    --ring: 40 40% 62%;
+
+    --kairos-cream: var(--paper);
+    --kairos-pearl: var(--paper-warm);
+    --kairos-charcoal: var(--ink);
+    --kairos-stone: var(--mute);
+  }
+}
+
+@layer base {
+  * { border-color: hsl(var(--border)); box-sizing: border-box; }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 104px;
+  }
+  html, body {
+    width: 100%;
+    min-height: 100%;
+  }
+  body {
+    font-family: 'Inter Tight', system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 15px;
+    line-height: 1.55;
+    transition: background 0.5s ease, color 0.5s ease;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--gold); color: oklch(0.14 0.006 60); }
+
+  .kairos-logo-img {
+    display: block;
+    transition: filter 0.5s ease;
+  }
+  .dark .kairos-logo-img,
+  .theme-dark .kairos-logo-img {
+    filter: invert(0.92) hue-rotate(180deg) brightness(1.05);
+  }
+}
+
+@layer components {
+  .bokeh-bg {
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(ellipse 700px 460px at 18% 12%, color-mix(in oklch, var(--gold) 11%, transparent), transparent 60%),
+      radial-gradient(ellipse 560px 420px at 82% 78%, color-mix(in oklch, var(--gold) 8%, transparent), transparent 65%);
+  }
+
+  .card-surface {
+    background: var(--paper-surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow:
+      0 1px 2px color-mix(in oklch, var(--ink) 3%, transparent),
+      0 10px 28px -20px color-mix(in oklch, var(--ink) 8%, transparent);
+    transition: background 0.5s ease, border-color 0.5s ease;
+  }
+  .card-surface.featured { background: var(--paper-warm); border-color: var(--gold); }
+
+  .btn-gold {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: inherit;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    border: 1px solid var(--ink);
+    border-radius: 9999px;
+    transition: transform 0.25s ease, background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+  }
+  .btn-gold::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(140px 90px at var(--mx, 50%) var(--my, 50%), var(--gold-soft), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .btn-gold:hover::before { opacity: 0.55; }
+  .btn-gold:hover {
+    transform: translateY(-1px);
+    background: color-mix(in oklch, var(--ink) 88%, var(--gold) 12%);
+  }
+  .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+  .dark .btn-gold, .theme-dark .btn-gold {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--paper);
+  }
+
+  .cta-ghost {
+    border: 1px solid var(--line);
+    color: var(--ink);
+    background: transparent;
+    border-radius: 9999px;
+    padding: 12px 22px;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    transition: border-color 0.3s ease, color 0.3s ease;
+  }
+  .cta-ghost:hover { border-color: var(--ink); }
+
+  .mono-label {
+    font-family: var(--font-jetbrains), 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .mono-label-wide { letter-spacing: 0.3em; }
+
+  .kicker {
+    font-family: var(--font-jetbrains), 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .kicker::before { content: '◆'; font-size: 9px; }
+  .dark .kicker, .theme-dark .kicker { color: var(--gold); }
+
+  .hairline { height: 1px; background: var(--line); width: 100%; }
+  .hairline-v { width: 1px; background: var(--line); align-self: stretch; }
+  .dotted-rule {
+    height: 1px;
+    background-image: linear-gradient(to right, currentColor 1px, transparent 1px);
+    background-size: 6px 1px;
+    background-repeat: repeat-x;
+    opacity: 0.35;
+  }
+
+  .grid-12 {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .editorial-display {
+    font-family: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: 0.94;
+    color: var(--ink);
+  }
+
+  .pull-quote {
+    font-family: inherit;
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.18;
+    color: var(--ink);
+  }
+
+  .step-num {
+    font-family: inherit;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--gold-dark);
+    letter-spacing: -0.02em;
+  }
+  .dark .step-num, .theme-dark .step-num { color: var(--gold); }
+
+  .metric-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper-surface);
+    padding: 22px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .metric-card .v {
+    font-size: 36px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .metric-card .v.italic { font-style: italic; color: var(--gold-dark); }
+  .dark .metric-card .v.italic, .theme-dark .metric-card .v.italic { color: var(--gold); }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.9s cubic-bezier(.2,.7,.2,1),
+      transform 0.9s cubic-bezier(.2,.7,.2,1);
+  }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  .reveal-d1 { transition-delay: 0.08s; }
+  .reveal-d2 { transition-delay: 0.16s; }
+  .reveal-d3 { transition-delay: 0.24s; }
+  .reveal-d4 { transition-delay: 0.32s; }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .italic-gold {
+    color: var(--gold);
+    font-style: italic;
+    font-family: inherit;
+    font-weight: 400;
+  }
+  .dark .italic-gold, .theme-dark .italic-gold { color: var(--gold); }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
