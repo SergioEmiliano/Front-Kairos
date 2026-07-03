@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/common/Reveal";
 
@@ -5,11 +8,15 @@ const displayFont = "var(--font-cormorant), 'Cormorant Garamond', Georgia, serif
 const monoFont = "var(--font-jetbrains), 'JetBrains Mono', monospace";
 const bodyFont = "var(--font-inter-tight), 'Inter Tight', system-ui, sans-serif";
 
+type Billing = "mensal" | "anual";
+
 const PLANS = [
   {
     id: "estudante",
     label: "Plano Estudante",
-    price: "R$ 890",
+    priceMonthly: "R$ 117",
+    priceAnnual: "R$ 99",
+    annualTotal: "R$ 1.188",
     desc: "Para doutoras em formação construindo base de pacientes.",
     features: [
       "DNA Estratégico guiado",
@@ -24,7 +31,9 @@ const PLANS = [
     id: "profissional",
     label: "Plano Profissional",
     badge: "◆ Recomendado",
-    price: "R$ 2.480",
+    priceMonthly: "R$ 287",
+    priceAnnual: "R$ 269",
+    annualTotal: "R$ 3.228",
     desc: "Para clínicas estabelecidas em busca de escala previsível.",
     features: [
       "DNA Estratégico completo",
@@ -33,12 +42,14 @@ const PLANS = [
       "Recalibração semanal + consultoria",
       "API proprietária de sinais de demanda",
     ],
-    cta: "Começar Pro",
+    cta: "Falar com curadoria",
     featured: true,
   },
 ];
 
 export function PricingSection() {
+  const [billing, setBilling] = useState<Billing>("anual");
+
   return (
     <section
       id="planos"
@@ -69,7 +80,57 @@ export function PricingSection() {
           </h2>
         </Reveal>
 
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[860px]">
+        {/* ── Billing toggle ── */}
+        <Reveal delay={1}>
+          <div
+            className="mt-10 flex items-center w-fit p-1 rounded-full"
+            style={{ background: "var(--paper-surface)", border: "1px solid var(--line)" }}
+          >
+            {(["mensal", "anual"] as Billing[]).map((b) => (
+              <button
+                key={b}
+                type="button"
+                onClick={() => setBilling(b)}
+                style={{
+                  fontFamily: monoFont,
+                  fontSize: 10,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  padding: "7px 18px",
+                  borderRadius: 99,
+                  background: billing === b ? "var(--ink)" : "transparent",
+                  color: billing === b ? "var(--paper)" : "var(--mute)",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "background 0.15s ease, color 0.15s ease",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                {b}
+                {b === "anual" && (
+                  <span
+                    style={{
+                      fontFamily: monoFont,
+                      fontSize: 8,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "var(--gold)",
+                      background: "color-mix(in oklch, var(--gold) 12%, transparent)",
+                      padding: "2px 7px",
+                      borderRadius: 99,
+                    }}
+                  >
+                    −15%
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </Reveal>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[860px]">
           {PLANS.map((plan, i) => (
             <Reveal key={plan.id} delay={(i % 2) as 0 | 1}>
               <div
@@ -125,7 +186,7 @@ export function PricingSection() {
                         color: "var(--ink)",
                       }}
                     >
-                      {plan.price}
+                      {billing === "anual" ? plan.priceAnnual : plan.priceMonthly}
                     </span>
                     <span
                       style={{
@@ -142,6 +203,20 @@ export function PricingSection() {
                       /mês
                     </span>
                   </div>
+                  <p
+                    style={{
+                      fontFamily: monoFont,
+                      fontSize: 9,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "var(--gold)",
+                      marginTop: 6,
+                      minHeight: 16,
+                      opacity: billing === "anual" ? 1 : 0,
+                    }}
+                  >
+                    {plan.annualTotal} cobrado anualmente
+                  </p>
                   <p
                     style={{
                       fontFamily: bodyFont,

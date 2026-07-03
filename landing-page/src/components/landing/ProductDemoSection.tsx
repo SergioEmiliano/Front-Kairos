@@ -818,7 +818,7 @@ export function ProductDemoSection() {
             color: "var(--ink)",
             marginTop: 24, maxWidth: "26ch",
           }}>
-            O sistema que pensa junto com a sua agenda.
+            Explore a Kairós
           </h2>
         </Reveal>
 

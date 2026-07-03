@@ -3,31 +3,31 @@ import { Reveal } from "@/components/common/Reveal";
 const MOTORS = [
   {
     n: "01",
-    title: "Motor matemático",
+    title: "Onboarding detalhado",
     sub: "Calendário · Previsibilidade",
     body:
-      "Calibragem semanal de calendário com base no seu DNA estratégico, sazonalidade e histórico de leads. Cada peça é encaixada onde tem maior probabilidade de converter.",
+      "Uma imersão no DNA do seu negócio para transformar sua identidade em uma estratégia de conteúdo clara e consistente.",
   },
   {
     n: "02",
     title: "Curadoria de copy",
     sub: "DNA Estratégico · Tom",
     body:
-      "Em vez de templates genéricos, sua linha editorial é mapeada em 6 etapas. O sistema gera conteúdo que soa como você — em formalidade, técnica e cadência.",
+      "Em vez de roteiros genéricos, a Kairós analisa seus dados e resultados para gerar conteúdos baseados no que já funciona, transformando acertos em um processo replicável e escalável.",
   },
   {
     n: "03",
-    title: "Calibragem de leads",
+    title: "Metrificação",
     sub: "Funil · Qualificação",
     body:
-      "Revisão semanal das leads recebidas, classificação por intenção e procedimento, e devolutiva dos pontos de fricção do funil — antes que virem perda de receita.",
+      "O Assistente Pessoal Kairós conecta-se à Meta Business Suite para monitorar seus resultados, identificar oportunidades de melhoria e transformar dados em direcionamentos práticos para o crescimento da sua marca.",
   },
   {
     n: "04",
     title: "Painel de receita",
     sub: "Faturamento · Conversão",
     body:
-      "Não medimos seguidores. Medimos faturamento mensal, conversão por procedimento, custo por lead qualificada e tempo recuperado em sua agenda clínica.",
+      "Com o registro diário da quantidade de leads gerados, a Kairós transforma esses dados em inteligência de crescimento, calculando indicadores como taxa de conversão, projeções de faturamento e metas necessárias para escalar os resultados de forma previsível.",
   },
 ];
 
@@ -77,20 +77,27 @@ export function MotorSection() {
                   color: "var(--ink-soft)",
                 }}
               >
-                Cada motor opera em uma frequência diferente — diária, semanal, mensal —
-                mas todos calibram o mesmo objetivo: receita previsível na sua clínica.
+                Operando em diferentes camadas da estratégia, nossos motores compartilham
+                o mesmo objetivo: fazer do conteúdo um ativo capaz de gerar clientes e
+                impulsionar o faturamento do seu negócio.
               </p>
             </Reveal>
           </div>
         </div>
 
-        <div
-          className="grid grid-cols-1 md:grid-cols-2 gap-px overflow-hidden rounded-[var(--radius)]"
-          style={{ background: "var(--line)", border: "1px solid var(--line)" }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {MOTORS.map((m, i) => (
-            <Reveal key={m.n} delay={(i % 4) as 0 | 1 | 2 | 3}>
-              <div style={{ background: "var(--paper-surface)", padding: "36px" }}>
+            <Reveal key={m.n} delay={(i % 4) as 0 | 1 | 2 | 3} className="h-full">
+              <div
+                style={{
+                  background: "var(--paper-surface)",
+                  padding: "36px",
+                  border: "1px solid var(--line)",
+                  borderRadius: "var(--radius)",
+                  height: "100%",
+                  boxSizing: "border-box",
+                }}
+              >
                 <div className="flex items-baseline justify-between mb-6">
                   <span
                     style={{

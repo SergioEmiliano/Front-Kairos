@@ -51,7 +51,7 @@ export function TestimonialsSection() {
         <div className="flex items-start justify-between flex-wrap gap-8 mb-16">
           <div>
             <Reveal>
-              <span className="kicker">Doutoras na Kairós</span>
+              <span className="kicker">Usuárias na Kairós</span>
             </Reveal>
             <Reveal delay={1}>
               <h2
@@ -99,9 +99,9 @@ export function TestimonialsSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {TESTIMONIALS.map((t, i) => (
-            <Reveal key={t.n} delay={(i % 4) as 0 | 1 | 2 | 3}>
+            <Reveal key={t.n} delay={(i % 4) as 0 | 1 | 2 | 3} className="h-full">
               <div
-                className="rounded-[var(--radius)] p-8 md:p-10 flex flex-col gap-6 cursor-pointer transition-all"
+                className="h-full rounded-[var(--radius)] p-8 md:p-10 flex flex-col gap-6 cursor-pointer transition-all"
                 style={{
                   border: active === i
                     ? "1px solid color-mix(in oklch, var(--gold) 50%, transparent)"

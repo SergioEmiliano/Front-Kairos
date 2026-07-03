@@ -14,7 +14,7 @@ const PROBLEMS = [
   {
     n: "03",
     title: "Crescimento imprevisível",
-    body: "Meses bons alternados com meses silenciosos — sem saber o porquê.",
+    body: "Meses bons alternados com meses silenciosos sem saber o porquê.",
   },
 ];
 
@@ -38,16 +38,16 @@ export function ProblemSection() {
               fontFamily: displayFont,
               fontSize: "clamp(48px, 7vw, 96px)",
               fontWeight: 400,
-              lineHeight: 0.94,
+              lineHeight: 1.0,
               letterSpacing: "-0.04em",
               color: "var(--ink)",
               marginTop: 24,
               maxWidth: "22ch",
             }}
           >
-            Conteúdo não é o que falta.{" "}
+            Você produz conteúdo,{" "}
             <span style={{ color: "var(--gold)", fontStyle: "italic" }}>
-              Direção é.
+              mas não vê resultado
             </span>
           </h2>
         </Reveal>

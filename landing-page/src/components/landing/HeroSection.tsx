@@ -18,21 +18,19 @@ export function HeroSection() {
           <h1
             style={{
               fontFamily: "var(--font-cormorant), 'Cormorant Garamond', Georgia, serif",
-              fontSize: "clamp(72px, 12vw, 184px)",
+              fontSize: "clamp(60px, 9vw, 148px)",
               fontWeight: 400,
-              lineHeight: 0.92,
+              lineHeight: 1.0,
               letterSpacing: "-0.04em",
               color: "var(--ink)",
               marginTop: 28,
             }}
           >
-            O crescimento
+            Menos improviso.
             <br />
             <span style={{ color: "var(--gold)", fontStyle: "italic" }}>
-              acontece no
+              Mais estratégia.
             </span>
-            <br />
-            momento certo.
           </h1>
         </Reveal>
 
@@ -47,9 +45,9 @@ export function HeroSection() {
               fontFamily: "var(--font-inter-tight), 'Inter Tight', system-ui, sans-serif",
             }}
           >
-            Kairós conecta sua meta financeira à produção de conteúdo, geração
-            de demanda e conversão em pacientes — com inteligência proprietária
-            calibrada para medicina estética de alto valor.
+            A Kairós conecta a produção de conteúdo à geração de demanda de
+            pacientes por meio de uma inteligência estrategicamente calibrada
+            para a realidade do seu negócio de beleza.
           </p>
         </Reveal>
 
@@ -81,28 +79,6 @@ export function HeroSection() {
           </div>
         </Reveal>
 
-        <Reveal delay={4}>
-          <div
-            className="mt-16 flex items-center gap-4"
-            style={{
-              fontFamily: "var(--font-jetbrains), 'JetBrains Mono', monospace",
-              fontSize: 10,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: "var(--mute)",
-            }}
-          >
-            <span
-              className="flex-1 h-px"
-              style={{ background: "var(--line)" }}
-            />
-            <span>Entrada por curadoria · 42 vagas</span>
-            <span
-              className="flex-1 h-px"
-              style={{ background: "var(--line)" }}
-            />
-          </div>
-        </Reveal>
       </div>
     </section>
   );

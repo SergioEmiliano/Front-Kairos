@@ -3,9 +3,9 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { ProblemSection } from "@/components/landing/ProblemSection";
 import { BeforeAfterSection } from "@/components/landing/BeforeAfterSection";
 import { MotorSection } from "@/components/landing/MotorSection";
+import { DiferenciaisSection } from "@/components/landing/DiferenciaisSection";
 import { ProductDemoSection } from "@/components/landing/ProductDemoSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
-import { AutonomiaSection } from "@/components/landing/AutonomiaSection";
 import { ConviteSection } from "@/components/landing/ConviteSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { FAQSection } from "@/components/landing/FAQSection";
@@ -28,16 +28,16 @@ export default function HomePage() {
         {/* 04 · Infraestrutura (landing-page) */}
         <MotorSection />
 
-        {/* 05 · Produto em Ação */}
+        {/* 05 · Diferenciais */}
+        <DiferenciaisSection />
+
+        {/* 06 · Produto em Ação */}
         <ProductDemoSection />
 
         {/* 06 · Doutoras na Kairós */}
         <TestimonialsSection />
 
-        {/* 07 · Autonomia da Doutora */}
-        <AutonomiaSection />
-
-        {/* 08 · Convite */}
+        {/* 07 · Convite */}
         <ConviteSection />
 
         {/* 09 · Card de Preço */}
