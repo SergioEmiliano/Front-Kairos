@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { OnboardingState, Procedure, ToneOfVoice, FormalityLevel } from "@/types";
+import { OnboardingState, Procedure, ToneOfVoice, FormalityLevel } from "@/shared/types";
 
 interface OnboardingStore extends OnboardingState {
   setStep: (step: number) => void;

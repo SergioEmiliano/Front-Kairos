@@ -1,17 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
-import { KairosLogo } from "@/components/common/KairosLogo";
-import { GoldButton } from "@/components/common/GoldButton";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Eye, EyeOff, Loader2, ArrowRight, ArrowLeft, AlertCircle } from "lucide-react";
+import { HourglassMark } from "@/shared/components/HourglassMark";
+import { LoginBackdrop } from "@/app/(auth)/login/components/LoginBackdrop";
+import { GoldButton } from "@/shared/components/GoldButton";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { cn } from "@/shared/lib/utils";
 import { authService } from "@/services/auth.service";
 import { useAppStore } from "@/store/app.store";
+
+// A assinatura acontece na landing page (fora deste app). O cadastro self-service
+// foi removido; aqui só apontamos para onde a médica pode assinar/reativar.
+const LANDING_URL =
+  process.env.NEXT_PUBLIC_LANDING_URL ?? "https://kairos.com.br";
+
+const LOGO_SHADOW =
+  "drop-shadow(0 10px 14px color-mix(in oklch, var(--ink) 40%, transparent))";
 
 const loginSchema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -20,13 +30,87 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>;
 
+// Estado de erro exibido no login: mensagem + (opcional) link para a landing.
+interface LoginError {
+  message: string;
+  showLandingLink?: boolean;
+}
+
+// Helper para declarar a custom property --d (delay do stagger) com tipagem.
+const delay = (d: string) => ({ "--d": d } as React.CSSProperties);
+
+// Erro de campo no estilo da página: tom terracota (--error) + ícone, em vez
+// do vermelho puro que destoa da paleta.
+function FieldError({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      className="text-xs flex items-center gap-1.5 mt-0.5"
+      style={{ color: "var(--error)" }}
+    >
+      <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+      <span>{children}</span>
+    </p>
+  );
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const setAuthenticated = useAppStore((s) => s.setAuthenticated);
+  const setFirstAccessCompleted = useAppStore((s) => s.setFirstAccessCompleted);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<LoginError | null>(null);
   const [remember, setRemember] = useState(true);
+
+  // ─── Animação de entrada: marca gira no centro e voa até o medalhão ────────
+  const [intro, setIntro] = useState(true);
+  const [reveal, setReveal] = useState(false);
+  const flyerRef = useRef<HTMLDivElement>(null);
+  const markRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const reduce = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    const flyer = flyerRef.current;
+    const target = markRef.current;
+
+    if (reduce || !flyer || !target) {
+      setReveal(true);
+      setIntro(false);
+      return;
+    }
+
+    // Mede o deslocamento do centro (flyer) até o medalhão (alvo).
+    const fr = flyer.getBoundingClientRect();
+    const tr = target.getBoundingClientRect();
+    const dx = tr.left + tr.width / 2 - (fr.left + fr.width / 2);
+    const dy = tr.top + tr.height / 2 - (fr.top + fr.height / 2);
+    const scale = tr.width / fr.width;
+
+    // Segura no centro enquanto a marca "acende" (preenche, via CSS), depois
+    // voa até o medalhão — continuando a transição vinda da landing.
+    const anim = flyer.animate(
+      [
+        { transform: "translate(0px,0px) scale(1)" },
+        { transform: "translate(0px,0px) scale(1)", offset: 0.42 },
+        {
+          transform: `translate(${dx}px,${dy}px) scale(${scale})`,
+          offset: 1,
+        },
+      ],
+      { duration: 1150, easing: "cubic-bezier(0.25,0.4,0.25,1)", fill: "forwards" }
+    );
+
+    // Revela o card enquanto a marca inicia o voo.
+    const revealT = setTimeout(() => setReveal(true), 600);
+    anim.onfinish = () => setIntro(false);
+
+    return () => {
+      clearTimeout(revealT);
+      anim.cancel();
+    };
+  }, []);
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -34,51 +118,100 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginForm) {
     setLoading(true);
-    setError("");
+    setError(null);
     try {
       const result = await authService.login(data);
+
       if (result.success) {
+        const firstAccess = result.firstAccessCompleted ?? true;
         authService.setAuth(result.token!);
         setAuthenticated(true);
-        router.push("/dashboard");
-      } else {
-        setError("Credenciais inválidas. Tente novamente.");
+        setFirstAccessCompleted(firstAccess);
+        // Primeiro acesso → onboarding obrigatório; caso contrário, dashboard.
+        router.push(firstAccess ? "/dashboard" : "/onboarding");
+        return;
+      }
+
+      switch (result.reason) {
+        case "pending_approval":
+          setError({
+            message:
+              "Seu acesso está sendo preparado. Em breve você receberá um e-mail com as credenciais de primeiro acesso.",
+          });
+          break;
+        case "subscription_inactive":
+          setError({
+            message:
+              "Sua assinatura está inativa. Reative na nossa página para voltar a acessar a Kairós.",
+            showLandingLink: true,
+          });
+          break;
+        default:
+          setError({ message: "Credenciais inválidas. Tente novamente." });
       }
     } catch {
-      setError("Erro ao conectar. Tente novamente.");
+      setError({ message: "Erro ao conectar. Tente novamente." });
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="absolute inset-0 flex flex-col overflow-hidden">
-      {/* Top chrome */}
-      <div className="px-8 py-5 flex items-center justify-between shrink-0">
-        <KairosLogo size="sm" />
-        <span className="mono-label mono-label-wide inline-flex items-center gap-2" style={{ color: "var(--gold-dark)" }}>
-          ◆ ENTRADA · CURADORIA
-        </span>
-      </div>
-      <div className="hairline shrink-0" />
+    <div className="theme-dark absolute inset-0 flex flex-col overflow-hidden bg-kairos-paper">
+      <LoginBackdrop />
+
+      <a
+        href={LANDING_URL}
+        className="absolute left-6 top-6 z-20 inline-flex items-center gap-1.5 text-xs text-kairos-stone hover:text-kairos-charcoal transition-colors"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" /> Voltar ao site
+      </a>
+
+      {/* Marca da animação de entrada — gira no centro e voa até o medalhão. */}
+      {intro && (
+        <div className="fixed inset-0 z-40 grid place-items-center pointer-events-none">
+          <div ref={flyerRef} style={{ filter: LOGO_SHADOW, color: "var(--ink)" }}>
+            <HourglassMark ignite style={{ width: 96, height: "auto", display: "block" }} />
+          </div>
+        </div>
+      )}
 
       {/* Center card */}
-      <div className="flex-1 min-h-0 grid place-items-center p-6">
-        <div className="card-surface w-full max-w-[460px] p-8 animate-fade-in">
-          <div className="flex flex-col gap-4">
-            <span className="kicker">Entrada</span>
-            <h1
-              className="text-[30px] text-kairos-charcoal leading-[1.05] font-medium"
-              style={{ letterSpacing: "-0.025em" }}
+      <div className="relative z-10 flex-1 min-h-0 grid place-items-center p-6">
+        <div
+          className={cn(
+            "login-card card-surface relative w-full max-w-[560px] px-10 pt-14 pb-10",
+            reveal && "revealed"
+          )}
+          style={{
+            background: "color-mix(in oklch, var(--paper-warm) 86%, #000)",
+            boxShadow:
+              "0 1px 2px color-mix(in oklch, var(--ink) 4%, transparent), 0 14px 36px -26px color-mix(in oklch, var(--ink) 22%, transparent)",
+          }}
+        >
+          {/* Medalhão real — centralizado por flex (sem transform que conflite).
+              Fica invisível durante a intro; a marca voadora pousa exatamente
+              aqui e então este assume. */}
+          <div className="absolute left-0 right-0 -top-8 flex justify-center">
+            <div
+              ref={markRef}
+              className="transition-opacity duration-200"
+              style={{ opacity: intro ? 0 : 1, filter: LOGO_SHADOW, color: "var(--ink)" }}
             >
-              Bem-vinda <span className="italic-gold font-medium">de volta</span>.
-            </h1>
-            <p className="text-[15px] text-kairos-charcoal/80 leading-[1.55]">
-              Seu sistema seguiu calibrando enquanto você esteve fora. Entre para retomar o mês.
-            </p>
+              <HourglassMark style={{ width: 64, height: "auto", display: "block" }} />
+            </div>
+          </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 mt-2">
-              <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
+            <h1
+              className="stg text-[30px] text-kairos-charcoal leading-[1.05] font-medium"
+              style={{ ...delay("0.05s"), letterSpacing: "-0.025em" }}
+            >
+              Bem-vindo(a) <span className="italic-gold font-medium">de volta</span>.
+            </h1>
+
+            <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4 mt-2">
+              <div className="stg flex flex-col gap-2" style={delay("0.12s")}>
                 <Label htmlFor="email" className="mono-label">
                   E-mail profissional
                 </Label>
@@ -89,10 +222,10 @@ export default function LoginPage() {
                   placeholder="dra.marina@clinicavasconcellos.com.br"
                   {...register("email")}
                 />
-                {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
+                {errors.email && <FieldError>{errors.email.message}</FieldError>}
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="stg flex flex-col gap-2" style={delay("0.18s")}>
                 <Label htmlFor="password" className="mono-label">Senha</Label>
                 <div className="relative">
                   <Input
@@ -111,14 +244,14 @@ export default function LoginPage() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-                {errors.password && <p className="text-xs text-red-600">{errors.password.message}</p>}
+                {errors.password && <FieldError>{errors.password.message}</FieldError>}
               </div>
 
-              <div className="flex items-center justify-between mt-1">
+              <div className="stg flex items-center justify-between mt-1" style={delay("0.24s")}>
                 <button
                   type="button"
                   onClick={() => setRemember(!remember)}
-                  className="inline-flex items-center gap-2 text-xs text-kairos-charcoal/80"
+                  className="inline-flex items-center gap-2 text-xs text-white"
                 >
                   <span
                     className="inline-flex items-center justify-center"
@@ -134,7 +267,7 @@ export default function LoginPage() {
                       <span className="text-[9px]" style={{ color: "var(--gold-dark)" }}>◆</span>
                     )}
                   </span>
-                  Manter conectada
+                  Manter conectado
                 </button>
                 <button
                   type="button"
@@ -145,34 +278,56 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <p className="text-xs text-red-600 text-center border border-red-200 rounded-lg p-2.5">
-                  {error}
-                </p>
+                <div
+                  className="text-xs text-center rounded-lg p-3 flex flex-col gap-1.5"
+                  style={{
+                    color: "var(--error)",
+                    background: "color-mix(in oklch, var(--error) 8%, transparent)",
+                    border: "1px solid color-mix(in oklch, var(--error) 28%, transparent)",
+                  }}
+                >
+                  <span className="inline-flex items-center justify-center gap-1.5 leading-snug">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    {error.message}
+                  </span>
+                  {error.showLandingLink && (
+                    <a
+                      href={LANDING_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-kairos-charcoal underline decoration-kairos-gold underline-offset-2 hover:text-kairos-gold-dark transition-colors"
+                    >
+                      Reativar assinatura →
+                    </a>
+                  )}
+                </div>
               )}
 
-              <GoldButton type="submit" fullWidth disabled={loading} className="mt-3">
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Entrando…
-                  </span>
-                ) : (
-                  <>
-                    Entrar na Kairós <ArrowRight className="h-3.5 w-3.5" />
-                  </>
-                )}
-              </GoldButton>
+              <div className="stg" style={delay("0.30s")}>
+                <GoldButton type="submit" fullWidth disabled={loading} className="btn-glow mt-3">
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Entrando…
+                    </span>
+                  ) : (
+                    <>
+                      Entrar na Kairós <ArrowRight className="h-3.5 w-3.5" />
+                    </>
+                  )}
+                </GoldButton>
+              </div>
 
-              <div className="dotted-rule my-2 text-kairos-line" />
+              <div className="stg dotted-rule my-2 text-kairos-line" style={delay("0.36s")} />
 
-              <div className="flex flex-col items-center gap-1.5 text-center">
+              <div className="stg flex flex-col items-center gap-1.5 text-center" style={delay("0.42s")}>
                 <span className="mono-label">Ainda não é Kairós?</span>
                 <button
                   type="button"
-                  onClick={() => router.push("/cadastro")}
-                  className="font-serif-display italic text-[18px] text-kairos-charcoal hover:underline decoration-kairos-gold underline-offset-4"
+                  onClick={() => router.push("/planos")}
+                  className="cursor-pointer font-serif-display italic text-[18px] text-kairos-charcoal hover:underline decoration-kairos-gold underline-offset-4"
                 >
-                  <span className="italic-gold">Assinar</span> →
+                  <span className="italic-gold">Conhecer planos e assinar</span> →
                 </button>
               </div>
             </form>
@@ -181,10 +336,8 @@ export default function LoginPage() {
       </div>
 
       {/* Footer band */}
-      <div className="hairline shrink-0" />
-      <div className="px-8 py-4 flex items-center justify-between shrink-0">
+      <div className="relative z-10 px-8 py-4 flex items-center justify-center shrink-0">
         <span className="mono-label">◆ KAIRÓS · 2026</span>
-        <span className="mono-label">412 DOUTORAS · 42 VAGAS · CICLO MAIO 2026</span>
       </div>
     </div>
   );

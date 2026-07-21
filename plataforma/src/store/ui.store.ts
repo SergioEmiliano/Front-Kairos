@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { CalendarView, ContentEntry } from "@/types";
+import { CalendarView, ContentEntry } from "@/shared/types";
 
 interface UIStore {
   // Sidebar

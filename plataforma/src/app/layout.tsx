@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
-import { ThemeProvider } from "@/components/common/ThemeProvider";
+import { ThemeProvider } from "@/shared/components/ThemeProvider";
 import "../app/globals.css";
 
 // Unified typeface: Inter Tight is used everywhere — body, display, and labels.

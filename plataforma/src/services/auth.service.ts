@@ -1,4 +1,5 @@
-import { delay } from "@/lib/utils";
+import { delay } from "@/shared/lib/utils";
+import type { SubscriptionStatus } from "@/shared/types";
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK !== "false";
 
@@ -7,25 +8,64 @@ export interface LoginCredentials {
   password: string;
 }
 
+// Motivo de uma falha de login, usado pela UI para escolher a mensagem certa.
+export type LoginFailureReason =
+  | "invalid_credentials"
+  | "pending_approval" // assinatura confirmada, aguardando aprovação do admin
+  | "subscription_inactive"; // cancelada / past_due / pagamento pendente
+
 export interface AuthResult {
   success: boolean;
+  reason?: LoginFailureReason;
   token?: string;
   userId?: string;
   name?: string;
-  onboardingComplete?: boolean;
+  subscriptionStatus?: SubscriptionStatus;
+  // false → primeiro acesso: a médica deve ser levada ao onboarding.
+  firstAccessCompleted?: boolean;
 }
+
+// ─── Cenários de mock ────────────────────────────────────────────────────────
+// Como o backend ainda não existe, e-mails de teste disparam cada estado para
+// que as telas de erro e o fluxo de primeiro acesso sejam demonstráveis.
+// Qualquer outro e-mail válido → assinatura ativa e onboarding já concluído.
+const MOCK_SCENARIOS: Record<string, AuthResult> = {
+  "pendente@kairos.com": {
+    success: false,
+    reason: "pending_approval",
+    subscriptionStatus: "pending_approval",
+  },
+  "cancelada@kairos.com": {
+    success: false,
+    reason: "subscription_inactive",
+    subscriptionStatus: "canceled",
+  },
+  "primeiroacesso@kairos.com": {
+    success: true,
+    token: "mock-jwt-token",
+    userId: "dr-novo-acesso",
+    name: "Dra. Marina Vasconcellos",
+    subscriptionStatus: "active",
+    firstAccessCompleted: false,
+  },
+};
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResult> {
     if (USE_MOCK) {
       await delay(800);
-      // Qualquer email/senha funciona no mock
+
+      const scenario = MOCK_SCENARIOS[credentials.email.trim().toLowerCase()];
+      if (scenario) return scenario;
+
+      // Caso padrão: assinatura ativa, onboarding já concluído.
       return {
         success: true,
         token: "mock-jwt-token",
         userId: "dr-ana-silva",
         name: "Dra. Ana Silva",
-        onboardingComplete: true,
+        subscriptionStatus: "active",
+        firstAccessCompleted: true,
       };
     }
     const res = await fetch("/api/auth/login", {

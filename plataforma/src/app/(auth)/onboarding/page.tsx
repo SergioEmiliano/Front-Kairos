@@ -1,23 +1,24 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { useAppStore } from "@/store/app.store";
 
-import { WelcomeStep } from "@/components/onboarding/steps/WelcomeStep";
-import { ProceduresStep } from "@/components/onboarding/steps/ProceduresStep";
-import type { ProcKey } from "@/components/onboarding/steps/ProceduresStep";
-import { HighlightStep } from "@/components/onboarding/steps/HighlightStep";
-import { PositioningStep } from "@/components/onboarding/steps/PositioningStep";
-import type { Positioning } from "@/components/onboarding/steps/PositioningStep";
-import { CommunicationStep } from "@/components/onboarding/steps/CommunicationStep";
-import type { CommStyle } from "@/components/onboarding/steps/CommunicationStep";
-import { AudienceStep } from "@/components/onboarding/steps/AudienceStep";
-import type { AudiencePersona } from "@/components/onboarding/steps/AudienceStep";
-import { GoalStep } from "@/components/onboarding/steps/GoalStep";
-import type { Goal } from "@/components/onboarding/steps/GoalStep";
-import { ProcessingStep } from "@/components/onboarding/steps/ProcessingStep";
+import { WelcomeStep } from "@/app/(auth)/onboarding/components/steps/WelcomeStep";
+import { ProceduresStep } from "@/app/(auth)/onboarding/components/steps/ProceduresStep";
+import type { ProcKey } from "@/app/(auth)/onboarding/components/steps/ProceduresStep";
+import { HighlightStep } from "@/app/(auth)/onboarding/components/steps/HighlightStep";
+import { PositioningStep } from "@/app/(auth)/onboarding/components/steps/PositioningStep";
+import type { Positioning } from "@/app/(auth)/onboarding/components/steps/PositioningStep";
+import { CommunicationStep } from "@/app/(auth)/onboarding/components/steps/CommunicationStep";
+import type { CommStyle } from "@/app/(auth)/onboarding/components/steps/CommunicationStep";
+import { AudienceStep } from "@/app/(auth)/onboarding/components/steps/AudienceStep";
+import type { AudiencePersona } from "@/app/(auth)/onboarding/components/steps/AudienceStep";
+import { GoalStep } from "@/app/(auth)/onboarding/components/steps/GoalStep";
+import type { Goal } from "@/app/(auth)/onboarding/components/steps/GoalStep";
+import { ProcessingStep } from "@/app/(auth)/onboarding/components/steps/ProcessingStep";
 
 // ─── Transition ──────────────────────────────────────────────────────
 type E4 = [number, number, number, number];
@@ -56,8 +57,27 @@ interface OnboardingData {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const isAuthenticated = useAppStore((s) => s.isAuthenticated);
+  const firstAccessCompleted = useAppStore((s) => s.firstAccessCompleted);
   const setAuthenticated = useAppStore((s) => s.setAuthenticated);
+  const setFirstAccessCompleted = useAppStore((s) => s.setFirstAccessCompleted);
   const setShowDnaBanner = useAppStore((s) => s.setShowDnaBanner);
+
+  // Gate de acesso ao onboarding (o (plataform)/layout não cobre esta rota):
+  // não autenticada → /login; onboarding já concluído → /dashboard.
+  // Garante que o onboarding só pode ser executado uma vez.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  useEffect(() => {
+    if (!hydrated) return;
+    if (!isAuthenticated) {
+      router.replace("/login");
+    } else if (firstAccessCompleted) {
+      router.replace("/dashboard");
+    }
+  }, [hydrated, isAuthenticated, firstAccessCompleted, router]);
 
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
@@ -76,6 +96,8 @@ export default function OnboardingPage() {
   function finish() {
     setShowDnaBanner(true);
     setAuthenticated(true);
+    // Conclui o primeiro acesso de forma definitiva: o onboarding não reaparece.
+    setFirstAccessCompleted(true);
     router.push("/dashboard");
   }
 
@@ -136,6 +158,16 @@ export default function OnboardingPage() {
     // 7 — Processamento IA
     <ProcessingStep key="processing" onFinish={finish} />,
   ];
+
+  // Enquanto o gate não liberou (hidratando ou prestes a redirecionar), não
+  // renderiza o wizard para evitar flash de conteúdo.
+  if (!hydrated || !isAuthenticated || firstAccessCompleted) {
+    return (
+      <div className="fixed inset-0 grid place-items-center" style={{ background: "var(--paper)" }}>
+        <Loader2 className="h-5 w-5 animate-spin text-kairos-stone" />
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 overflow-hidden" style={{ background: "var(--paper)" }}>
