@@ -1,0 +1,30 @@
+# Kairós — frontend PROD (padrão).
+# Sobe SÓ o serviço web (Next.js standalone). A API do backend é externa,
+# referenciada por env (NEXT_PUBLIC_API_URL). Sem bind-mount, sem banco.
+services:
+  web:
+    build:
+      context: .
+      target: runner
+      args:
+        # NEXT_PUBLIC_* são inlinados no bundle em build-time.
+        NEXT_PUBLIC_USE_MOCK: ${NEXT_PUBLIC_USE_MOCK:-false}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_LANDING_URL: ${NEXT_PUBLIC_LANDING_URL}
+    image: kairos-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # NEXT_PUBLIC_* NÃO vai aqui: é inlinado em build-time (ver build.args).
+      # Env de runtime não altera o bundle -> só variáveis server-side entram aqui.
+    healthcheck:
+      # 127.0.0.1 (não 'localhost'): busybox wget resolve localhost p/ ::1 e o
+      # Next liga em 0.0.0.0 (IPv4) -> com 'localhost' o healthcheck falharia sempre.
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000/login"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

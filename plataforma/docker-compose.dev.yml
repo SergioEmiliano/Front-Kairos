@@ -1,0 +1,23 @@
+# Kairós — frontend DEV local/teste.
+# Sobe SÓ o serviço web (next dev, hot-reload). Bind-mount do código.
+# NÃO sobe Postgres/Redis — o backend é dono dos dados no dev.
+services:
+  web:
+    build:
+      context: .
+      target: dev
+    image: kairos-frontend-dev:latest
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      # API do backend rodando localmente (ajuste conforme o compose do backend).
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NEXT_PUBLIC_USE_MOCK: ${NEXT_PUBLIC_USE_MOCK:-true}
+    volumes:
+      # Bind-mount do código para hot-reload; node_modules e .next ficam no container.
+      - .:/app
+      - /app/node_modules
+      - /app/.next
