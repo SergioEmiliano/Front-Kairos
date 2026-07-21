@@ -83,6 +83,20 @@ function SheepSilhouette() {
       <ellipse cx="164" cy="116" rx="13" ry="19" fill="var(--ink)" transform="rotate(18 164 116)" />
       {/* Muzzle */}
       <ellipse cx="100" cy="162" rx="34" ry="27" fill="var(--ink)" />
+      {/* Chifres — traçado único em espiral, preenchido por dentro (não mais
+          oco), levemente menor, na lateral da cabeça. */}
+      <g transform="translate(52,60) scale(0.8) translate(-52,-60)">
+        <path
+          d="M52,58 C22,54 2,74 6,100 C9,122 28,136 50,130 C36,126 28,112 34,98 C39,88 50,84 58,90"
+          fill="var(--gold)" stroke="var(--gold)" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"
+        />
+      </g>
+      <g transform="translate(148,60) scale(0.8) translate(-148,-60)">
+        <path
+          d="M148,58 C178,54 198,74 194,100 C191,122 172,136 150,130 C164,126 172,112 166,98 C161,88 150,84 142,90"
+          fill="var(--gold)" stroke="var(--gold)" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"
+        />
+      </g>
     </svg>
   );
 }
@@ -91,7 +105,7 @@ export function DiferenciaisSection() {
   return (
     <section
       id="diferenciais"
-      style={{ paddingTop: 180, paddingBottom: 180, borderTop: "1px solid var(--line)" }}
+      style={{ paddingTop: 120, paddingBottom: 120, borderTop: "1px solid var(--line)" }}
     >
       <div className="max-w-[1240px] mx-auto px-6 lg:px-10">
         {/* ── Header ── */}
@@ -102,7 +116,7 @@ export function DiferenciaisSection() {
           <h2
             style={{
               fontFamily: displayFont,
-              fontSize: "clamp(44px, 6vw, 80px)",
+              fontSize: "clamp(34px, 4.5vw, 56px)",
               fontWeight: 400,
               lineHeight: 0.96,
               letterSpacing: "-0.04em",
@@ -139,7 +153,7 @@ export function DiferenciaisSection() {
               <h3
                 style={{
                   fontFamily: displayFont,
-                  fontSize: "clamp(32px, 4vw, 52px)",
+                  fontSize: "clamp(26px, 3vw, 40px)",
                   fontWeight: 400,
                   lineHeight: 1.0,
                   letterSpacing: "-0.03em",
@@ -315,7 +329,7 @@ export function DiferenciaisSection() {
               <h3
                 style={{
                   fontFamily: displayFont,
-                  fontSize: "clamp(32px, 4vw, 52px)",
+                  fontSize: "clamp(26px, 3vw, 40px)",
                   fontWeight: 400,
                   lineHeight: 1.0,
                   letterSpacing: "-0.03em",

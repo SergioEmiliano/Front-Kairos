@@ -3,16 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { KairosLogo } from "@/components/common/KairosLogo";
+import { ThemeSwitch } from "@/components/common/ThemeSwitch";
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://kairos.app";
 
 const NAV = [
   { href: "#produto", label: "Produto" },
   { href: "#metodo", label: "Método" },
-  { href: "#planos", label: "Planos" },
+  { href: `${APP_URL}/planos`, label: "Planos" },
   { href: "#manifesto", label: "Manifesto" },
 ];
 
 const bodyFont = "var(--font-inter-tight), 'Inter Tight', system-ui, sans-serif";
-const monoFont = "var(--font-jetbrains), 'JetBrains Mono', monospace";
 
 export function TopBar() {
   const [scrolled, setScrolled] = useState(false);
@@ -44,7 +46,7 @@ export function TopBar() {
           maxWidth: 1240,
           margin: "0 auto",
           padding: "0 24px",
-          height: 80,
+          height: 64,
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
@@ -88,24 +90,26 @@ export function TopBar() {
           ))}
         </nav>
 
-        {/* Entrar button */}
-        <a
-          href={`${process.env.NEXT_PUBLIC_APP_URL ?? "https://app.kairos.med"}/login`}
-          style={{
-            fontFamily: bodyFont,
-            fontSize: 13,
-            fontWeight: 500,
-            color: "var(--ink)",
-            border: "1px solid var(--line)",
-            borderRadius: 9999,
-            padding: "9px 20px",
-            textDecoration: "none",
-            transition: "border-color 0.2s",
-            flexShrink: 0,
-          }}
-        >
-          Entrar
-        </a>
+        {/* Utilidades: tema + Entrar */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+          <ThemeSwitch compact />
+          <a
+            href={`${APP_URL}/login`}
+            style={{
+              fontFamily: bodyFont,
+              fontSize: 13,
+              fontWeight: 500,
+              color: "var(--ink)",
+              border: "1px solid var(--line)",
+              borderRadius: 9999,
+              padding: "8px 18px",
+              textDecoration: "none",
+              transition: "border-color 0.2s",
+            }}
+          >
+            Entrar
+          </a>
+        </div>
       </div>
     </header>
   );

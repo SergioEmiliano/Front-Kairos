@@ -71,7 +71,7 @@ export function AppDemoSection() {
                   <span className="w-2.5 h-2.5 rounded-full" style={{ background: "color-mix(in oklch, var(--ink) 12%, transparent)" }} />
                   <span className="w-2.5 h-2.5 rounded-full" style={{ background: "color-mix(in oklch, var(--ink) 12%, transparent)" }} />
                   <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--gold)" }} />
-                  <span className="mono-label ml-3">app.kairos.med</span>
+                  <span className="mono-label ml-3">kairos.app</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="mono-label">◆ AO VIVO</span>

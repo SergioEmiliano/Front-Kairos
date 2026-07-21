@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { Inter_Tight, Cormorant_Garamond, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/common/ThemeProvider";
+import { SmoothAnchorScroll } from "@/components/common/SmoothAnchorScroll";
 import "./globals.css";
 
+// Pesos enxutos para o que o site realmente usa (400/500/600) — evita baixar
+// famílias de fonte não utilizadas (300/700 do Inter, 300/600 do Cormorant).
 const interTight = Inter_Tight({
   subsets: ["latin"],
   variable: "--font-inter-tight",
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   style: ["normal", "italic"],
   display: "swap",
 });
@@ -14,7 +17,7 @@ const interTight = Inter_Tight({
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   variable: "--font-cormorant",
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"],
   style: ["normal", "italic"],
   display: "swap",
 });
@@ -30,7 +33,7 @@ export const metadata: Metadata = {
   title: "Kairós — Sistema de crescimento previsível",
   description:
     "Infraestrutura de crescimento clínico para medicina estética. Curadoria, calibragem e operação contínua. Ciclo maio 2026 — 42 vagas.",
-  metadataBase: new URL("https://kairos.med"),
+  metadataBase: new URL("https://kairos.com.br"),
   openGraph: {
     title: "Kairós — Sistema de crescimento previsível",
     description:
@@ -50,7 +53,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <SmoothAnchorScroll />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,8 +1,38 @@
 import { Reveal } from "@/components/common/Reveal";
 
+// Ícones (Lucide, via allsvgicons.com) — um por motor, reforçando o conceito
+// de cada card sem depender só do número.
+function MotorIcon({ kind }: { kind: "calendar" | "dna" | "filter" | "trending" }) {
+  const common = { fill: "none" as const, stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      {kind === "calendar" && (
+        <g {...common}>
+          <path d="M8 2v4m8-4v4" />
+          <rect width="18" height="18" x="3" y="4" rx="2" />
+          <path d="M3 10h18M9 16l2 2l4-4" />
+        </g>
+      )}
+      {kind === "dna" && (
+        <path {...common} d="m10 16l1.5 1.5M14 8l-1.5-1.5M15 2c-1.798 1.998-2.518 3.995-2.807 5.993M16.5 10.5l1 1M17 6l-2.891-2.891M2 15c6.667-6 13.333 0 20-6m-2 0l.891.891M3.109 14.109L4 15m2.5-2.5l1 1M7 18l2.891 2.891M9 22c1.798-1.998 2.518-3.995 2.807-5.993" />
+      )}
+      {kind === "filter" && (
+        <path {...common} d="M22 3H2l8 9.46V19l4 2v-8.54z" />
+      )}
+      {kind === "trending" && (
+        <g {...common}>
+          <path d="M16 7h6v6" />
+          <path d="m22 7l-8.5 8.5l-5-5L2 17" />
+        </g>
+      )}
+    </svg>
+  );
+}
+
 const MOTORS = [
   {
     n: "01",
+    icon: "calendar" as const,
     title: "Onboarding detalhado",
     sub: "Calendário · Previsibilidade",
     body:
@@ -10,6 +40,7 @@ const MOTORS = [
   },
   {
     n: "02",
+    icon: "dna" as const,
     title: "Curadoria de copy",
     sub: "DNA Estratégico · Tom",
     body:
@@ -17,6 +48,7 @@ const MOTORS = [
   },
   {
     n: "03",
+    icon: "filter" as const,
     title: "Metrificação",
     sub: "Funil · Qualificação",
     body:
@@ -24,6 +56,7 @@ const MOTORS = [
   },
   {
     n: "04",
+    icon: "trending" as const,
     title: "Painel de receita",
     sub: "Faturamento · Conversão",
     body:
@@ -38,8 +71,8 @@ const bodyFont = "var(--font-inter-tight), 'Inter Tight', system-ui, sans-serif"
 export function MotorSection() {
   return (
     <section
-      id="manifesto"
-      style={{ paddingTop: 180, paddingBottom: 180, borderTop: "1px solid var(--line)" }}
+      id="motor"
+      style={{ paddingTop: 120, paddingBottom: 120, borderTop: "1px solid var(--line)" }}
     >
       <div className="max-w-[1240px] mx-auto px-6 lg:px-10">
         <div className="grid-12 mb-16">
@@ -53,7 +86,7 @@ export function MotorSection() {
               <h2
                 style={{
                   fontFamily: displayFont,
-                  fontSize: "clamp(44px, 6vw, 80px)",
+                  fontSize: "clamp(34px, 4.5vw, 56px)",
                   fontWeight: 400,
                   lineHeight: 0.96,
                   letterSpacing: "-0.04em",
@@ -98,18 +131,35 @@ export function MotorSection() {
                   boxSizing: "border-box",
                 }}
               >
-                <div className="flex items-baseline justify-between mb-6">
-                  <span
-                    style={{
-                      fontFamily: displayFont,
-                      fontSize: 36,
-                      color: "var(--gold)",
-                      fontStyle: "italic",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {m.n}
-                  </span>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <span
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        border: "1px solid var(--line)",
+                        color: "var(--gold)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <MotorIcon kind={m.icon} />
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: displayFont,
+                        fontSize: 36,
+                        color: "var(--gold)",
+                        fontStyle: "italic",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {m.n}
+                    </span>
+                  </div>
                   <span
                     style={{
                       fontFamily: monoFont,

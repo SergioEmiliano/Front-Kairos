@@ -803,7 +803,7 @@ export function ProductDemoSection() {
   return (
     <section
       id="produto"
-      style={{ paddingTop: 180, paddingBottom: 180, borderTop: "1px solid var(--line)" }}
+      style={{ paddingTop: 120, paddingBottom: 120, borderTop: "1px solid var(--line)" }}
     >
       <div className="max-w-[1240px] mx-auto px-6 lg:px-10">
         <Reveal>
@@ -812,7 +812,7 @@ export function ProductDemoSection() {
         <Reveal delay={1}>
           <h2 style={{
             fontFamily: dFont,
-            fontSize: "clamp(44px, 6.5vw, 88px)",
+            fontSize: "clamp(34px, 4.5vw, 60px)",
             fontWeight: 400, lineHeight: 0.94,
             letterSpacing: "-0.04em",
             color: "var(--ink)",

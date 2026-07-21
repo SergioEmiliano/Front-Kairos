@@ -19,13 +19,12 @@ const PROBLEMS = [
 ];
 
 const displayFont = "var(--font-cormorant), 'Cormorant Garamond', Georgia, serif";
-const monoFont = "var(--font-jetbrains), 'JetBrains Mono', monospace";
 
 export function ProblemSection() {
   return (
     <section
       id="problema"
-      style={{ paddingTop: 180, paddingBottom: 180, borderTop: "1px solid var(--line)" }}
+      style={{ paddingTop: 120, paddingBottom: 120, borderTop: "1px solid var(--line)" }}
     >
       <div className="max-w-[1240px] mx-auto px-6 lg:px-10">
         <Reveal>
@@ -36,7 +35,7 @@ export function ProblemSection() {
           <h2
             style={{
               fontFamily: displayFont,
-              fontSize: "clamp(48px, 7vw, 96px)",
+              fontSize: "clamp(36px, 5vw, 64px)",
               fontWeight: 400,
               lineHeight: 1.0,
               letterSpacing: "-0.04em",

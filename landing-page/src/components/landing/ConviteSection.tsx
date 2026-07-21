@@ -10,8 +10,8 @@ export function ConviteSection() {
     <section
       id="convite"
       style={{
-        paddingTop: 180,
-        paddingBottom: 180,
+        paddingTop: 120,
+        paddingBottom: 120,
         background: "var(--ink)",
         color: "var(--paper)",
       }}
@@ -41,7 +41,7 @@ export function ConviteSection() {
               <h2
                 style={{
                   fontFamily: displayFont,
-                  fontSize: "clamp(48px, 7vw, 104px)",
+                  fontSize: "clamp(36px, 5vw, 68px)",
                   fontWeight: 400,
                   lineHeight: 0.92,
                   letterSpacing: "-0.04em",
@@ -76,7 +76,7 @@ export function ConviteSection() {
             <Reveal delay={3}>
               <div className="flex flex-wrap items-center gap-4 mt-10">
                 <a
-                  href={`${process.env.NEXT_PUBLIC_APP_URL ?? "https://app.kairos.med"}/cadastro`}
+                  href={`${process.env.NEXT_PUBLIC_APP_URL ?? "https://kairos.app"}/planos`}
                   className="inline-flex items-center gap-2.5 h-12 px-7 rounded-full text-[14px] font-medium transition-all hover:-translate-y-px"
                   style={{
                     background: "var(--gold)",

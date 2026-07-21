@@ -6,8 +6,8 @@ import { MotorSection } from "@/components/landing/MotorSection";
 import { DiferenciaisSection } from "@/components/landing/DiferenciaisSection";
 import { ProductDemoSection } from "@/components/landing/ProductDemoSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+import { ManifestoSection } from "@/components/landing/ManifestoSection";
 import { ConviteSection } from "@/components/landing/ConviteSection";
-import { PricingSection } from "@/components/landing/PricingSection";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { Footer } from "@/components/landing/Footer";
 
@@ -34,16 +34,16 @@ export default function HomePage() {
         {/* 06 · Produto em Ação */}
         <ProductDemoSection />
 
-        {/* 06 · Doutoras na Kairós */}
+        {/* 07 · Doutoras na Kairós */}
         <TestimonialsSection />
 
-        {/* 07 · Convite */}
+        {/* 08 · Manifesto */}
+        <ManifestoSection />
+
+        {/* 09 · Convite */}
         <ConviteSection />
 
-        {/* 09 · Card de Preço */}
-        <PricingSection />
-
-        {/* 10 · Dúvidas (landing-page) */}
+        {/* 10 · Dúvidas */}
         <FAQSection />
       </main>
       <Footer />

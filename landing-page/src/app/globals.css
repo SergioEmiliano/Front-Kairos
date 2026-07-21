@@ -78,11 +78,19 @@
   * { border-color: hsl(var(--border)); box-sizing: border-box; }
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 104px;
+    scroll-padding-top: 88px;
   }
   html, body {
     width: 100%;
     min-height: 100%;
+  }
+
+  /* Perf: pula render/layout das seções fora da tela até chegarem perto do
+     viewport (a hero — primeira section — fica de fora, é o conteúdo inicial).
+     contain-intrinsic-size reserva altura estimada para não pular o scroll. */
+  main > section ~ section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
   }
   body {
     font-family: 'Inter Tight', system-ui, sans-serif;
@@ -288,6 +296,54 @@
   .dark .italic-gold, .theme-dark .italic-gold { color: var(--gold); }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { scrollbar-width: none; }
+
+  .scroll-cue {
+    animation: scroll-cue 3.2s ease-in-out infinite;
+  }
+
+  /* Ampulheta da hero — só contorno. As linhas são traçadas conforme a página
+     inicializa (stroke-dashoffset); ao terminar o traço, o símbolo dá um spin
+     e permanece como contorno. Roda uma vez. */
+  .hourglass-draw path {
+    stroke-dasharray: 1;
+    animation: hourglass-draw 1.8s linear forwards;
+  }
+  .hourglass-draw {
+    transform-origin: center;
+    animation: hourglass-spin 1.4s cubic-bezier(0.45, 0, 0.25, 1) 1.8s both;
+  }
+
+  /* Indicador de continuidade entre a hero e a próxima seção: um brilho
+     dourado que desce pela linha, sugerindo "há mais conteúdo abaixo". */
+  .scroll-flow {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--gold) 45%,
+      var(--gold) 55%,
+      transparent 100%
+    );
+    background-size: 100% 220%;
+    background-repeat: no-repeat;
+    animation: scroll-flow 2.6s ease-in-out infinite;
+  }
+}
+
+@keyframes hourglass-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes hourglass-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hourglass-draw { animation: none; }
+  .hourglass-draw path { animation: none; stroke-dasharray: none; }
+}
+@keyframes scroll-flow {
+  0%   { background-position: 0 -110%; }
+  100% { background-position: 0 110%; }
 }
 
 @keyframes shimmer {
@@ -301,4 +357,8 @@
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
+}
+@keyframes scroll-cue {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.85; }
 }

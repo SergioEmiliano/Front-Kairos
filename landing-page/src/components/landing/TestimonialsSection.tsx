@@ -45,7 +45,7 @@ export function TestimonialsSection() {
   return (
     <section
       id="depoimentos"
-      style={{ paddingTop: 180, paddingBottom: 180, borderTop: "1px solid var(--line)" }}
+      style={{ paddingTop: 120, paddingBottom: 120, borderTop: "1px solid var(--line)" }}
     >
       <div className="max-w-[1240px] mx-auto px-6 lg:px-10">
         <div className="flex items-start justify-between flex-wrap gap-8 mb-16">
@@ -57,7 +57,7 @@ export function TestimonialsSection() {
               <h2
                 style={{
                   fontFamily: displayFont,
-                  fontSize: "clamp(44px, 6vw, 80px)",
+                  fontSize: "clamp(34px, 4.5vw, 56px)",
                   fontWeight: 400,
                   lineHeight: 0.96,
                   letterSpacing: "-0.04em",

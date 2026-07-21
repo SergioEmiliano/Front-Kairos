@@ -35,15 +35,59 @@ const MUTED_L    = "oklch(0.58 0.007 70)";
 const MUTED_D    = "oklch(0.46 0.008 65)";
 const LINE_L     = "oklch(0.88 0.006 80)";
 const LINE_D     = "oklch(0.28 0.012 52)";
-const WHITE_S    = "oklch(0.91 0.005 80)";
 
 // Shared layout constants — SAME value used by both halves, guaranteeing
 // that every grid row has identical height on both panels.
 const PH        = "clamp(24px, 3.5vw, 52px)";   // horizontal padding
 const HDR_H     = "clamp(46px, 5.6vw, 72px)";   // explicit header / footer height
-const BODY_GAP  = "clamp(12px, 1.5vw, 20px)";
-const PHRASE_SZ = "clamp(16px, 1.62vw, 26px)";
+const CARD_SZ   = "clamp(16px, 1.7vw, 21px)";   // rótulo dos cards ilustrados
 const MONO_SZ   = "clamp(9px, 0.62vw, 11px)";
+
+// ─── Ícones ilustrativos (negativo ↔ positivo) ─────────────────────────────
+// Cada card do "antes" e do "depois" carrega um glifo próprio — o contraste
+// visual entre os dois já nasce do próprio slider revelando um painel ou outro.
+type IconKind = "scatter" | "luck" | "jagged" | "cycle";
+const ICON_ORDER: IconKind[] = ["scatter", "luck", "jagged", "cycle"];
+
+// Traçados originais do pacote Lucide (via allsvgicons.com) — viewBox 24×24,
+// mesmo estilo de stroke do design system (round cap/join).
+const ICON_PATHS: Record<IconKind, { before: React.ReactNode; after: React.ReactNode }> = {
+  scatter: {
+    // shuffle (sem direção clara) → move-up-right (rumo à meta)
+    before: <path d="m18 14l4 4l-4 4m0-20l4 4l-4 4M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22M2 6h1.972a4 4 0 0 1 3.6 2.2M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45" />,
+    after: <path d="M13 5h6v6m0-6L5 19" />,
+  },
+  luck: {
+    // dado (sorte) → alvo (previsibilidade)
+    before: <><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path d="M16 8h.01M8 8h.01M8 16h.01M16 16h.01M12 12h.01" /></>,
+    after: <><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></>,
+  },
+  jagged: {
+    // barras em queda (ritmo quebrado) → barras em crescimento constante
+    before: <path d="M5 21V3m7 18V9m7 12v-6" />,
+    after: <path d="M5 21v-6m7 6V9m7 12V3" />,
+  },
+  cycle: {
+    // refresh (refeito toda semana) → infinito (ajuste automático contínuo)
+    before: <path d="M3 12a9 9 0 0 1 9-9a9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5m5 4a9 9 0 0 1-9 9a9.75 9.75 0 0 1-6.74-2.74L3 16m5 0H3v5" />,
+    after: <path d="M6 16c5 0 7-8 12-8a4 4 0 0 1 0 8c-5 0-7-8-12-8a4 4 0 1 0 0 8" />,
+  },
+};
+
+function TransformIcon({ kind, revealed, size = 20 }: { kind: IconKind; revealed: boolean; size?: number }) {
+  const stroke = revealed ? GOLD_VAR : MUTED_L;
+  // strokeWidth fica fixo em 2 (padrão Lucide) — o SVG já escala o traço
+  // junto com o ícone via width/height vs viewBox, escalar os dois juntos
+  // deixava o traço grosso demais e fundia os anéis do alvo, por exemplo.
+  const common = { stroke, strokeWidth: 2, fill: "none", strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  const glyph = ICON_PATHS[kind][revealed ? "after" : "before"];
+
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      <g {...common}>{glyph}</g>
+    </svg>
+  );
+}
 
 // ─── Bar chart ───────────────────────────────────────────────────────────────
 function Bars({ isAfter }: { isAfter: boolean }) {
@@ -67,8 +111,8 @@ function Bars({ isAfter }: { isAfter: boolean }) {
 // colour variants as `position:absolute inset:0` children *inside each row*.
 // The row heights come from an invisible spacer element — so both halves
 // share the exact same pixel-perfect vertical dimensions.
-function BeforeAfterSlider() {
-  const [pct, setPct] = useState(95); // start near right edge
+// Controlado pelo pai: o texto à esquerda reage ao mesmo `pct` do arrasto.
+function BeforeAfterSlider({ pct, setPct }: { pct: number; setPct: (v: number) => void }) {
   const outerRef  = useRef<HTMLDivElement>(null);
   const dragging  = useRef(false);
 
@@ -171,45 +215,59 @@ function BeforeAfterSlider() {
               </div>
             </div>
 
-            {/* ── ROW 2: Bullets ──────────────────────────────────────── */}
+            {/* ── ROW 2: Ilustração + texto (2×2, sem cartão) ─────────── */}
             <div style={{ position: "relative", overflow: "hidden" }}>
-              {/* BEFORE bullets */}
+              {/* BEFORE */}
               <div style={{
                 ...row, clipPath: bClip,
                 background: CREAM,
-                gap: BODY_GAP,
-                padding: `clamp(28px, 4vw, 56px) ${PH}`,
+                padding: `clamp(10px, 1.6vw, 20px) ${PH}`,
                 justifyContent: "center",
               }}>
-                {BEFORE.bullets.map((b, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "baseline", gap: "clamp(14px, 1.6vw, 22px)" }}>
-                    <span style={{ fontFamily: monoFont, fontSize: MONO_SZ, letterSpacing: "0.08em", color: MUTED_L, fontWeight: 700, flexShrink: 0, minWidth: "1.8em" }}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span style={{ fontFamily: displayFont, fontSize: PHRASE_SZ, fontWeight: 600, letterSpacing: "-0.025em", lineHeight: 1.15, color: INK }}>
-                      {b}
-                    </span>
-                  </div>
-                ))}
+                <div style={{
+                  display: "grid", gridTemplateColumns: "1fr 1fr",
+                  columnGap: "clamp(10px, 1.6vw, 20px)",
+                  rowGap: "clamp(14px, 2.2vw, 24px)",
+                  width: "100%",
+                }}>
+                  {BEFORE.bullets.map((b, i) => (
+                    <div key={i} style={{
+                      display: "flex", flexDirection: "column", alignItems: "center",
+                      textAlign: "center", gap: "clamp(8px, 1vw, 12px)",
+                    }}>
+                      <TransformIcon kind={ICON_ORDER[i]} revealed={false} size={56} />
+                      <span style={{ fontFamily: displayFont, fontSize: CARD_SZ, fontWeight: 600, letterSpacing: "-0.01em", lineHeight: 1.2, color: INK }}>
+                        {b}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              {/* AFTER bullets */}
+              {/* AFTER */}
               <div style={{
                 ...row, clipPath: aClip,
                 background: ESPRESSO,
-                gap: BODY_GAP,
-                padding: `clamp(28px, 4vw, 56px) ${PH}`,
+                padding: `clamp(10px, 1.6vw, 20px) ${PH}`,
                 justifyContent: "center",
               }}>
-                {AFTER.bullets.map((b, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "baseline", gap: "clamp(14px, 1.6vw, 22px)" }}>
-                    <span style={{ fontFamily: monoFont, fontSize: MONO_SZ, letterSpacing: "0.08em", color: WHITE_S, fontWeight: 700, flexShrink: 0, minWidth: "1.8em" }}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span style={{ fontFamily: displayFont, fontSize: PHRASE_SZ, fontWeight: 600, letterSpacing: "-0.025em", lineHeight: 1.15, color: GOLD_VAR }}>
-                      {b}
-                    </span>
-                  </div>
-                ))}
+                <div style={{
+                  display: "grid", gridTemplateColumns: "1fr 1fr",
+                  columnGap: "clamp(10px, 1.6vw, 20px)",
+                  rowGap: "clamp(14px, 2.2vw, 24px)",
+                  width: "100%",
+                }}>
+                  {AFTER.bullets.map((b, i) => (
+                    <div key={i} style={{
+                      display: "flex", flexDirection: "column", alignItems: "center",
+                      textAlign: "center", gap: "clamp(8px, 1vw, 12px)",
+                    }}>
+                      <TransformIcon kind={ICON_ORDER[i]} revealed={true} size={56} />
+                      <span style={{ fontFamily: displayFont, fontSize: CARD_SZ, fontWeight: 600, letterSpacing: "-0.01em", lineHeight: 1.2, color: GOLD_VAR }}>
+                        {b}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -311,10 +369,12 @@ function BeforeAfterSlider() {
 // ─── Section ─────────────────────────────────────────────────────────────────
 export function BeforeAfterSection() {
   const displayFont2 = "var(--font-cormorant), 'Cormorant Garamond', Georgia, serif";
+  const [pct, setPct] = useState(95); // start near right edge (mostra "antes")
+
   return (
     <section
       id="metodo"
-      style={{ paddingTop: 180, paddingBottom: 180, borderTop: "1px solid var(--line)" }}
+      style={{ paddingTop: 120, paddingBottom: 120, borderTop: "1px solid var(--line)" }}
     >
       <div className="max-w-[1240px] mx-auto px-6 lg:px-10">
         <Reveal>
@@ -323,7 +383,7 @@ export function BeforeAfterSection() {
         <Reveal delay={1}>
           <h2 style={{
             fontFamily: displayFont2,
-            fontSize: "clamp(44px, 6.5vw, 88px)",
+            fontSize: "clamp(34px, 4.5vw, 60px)",
             fontWeight: 400, lineHeight: 0.94,
             letterSpacing: "-0.04em",
             color: "var(--ink)",
@@ -334,7 +394,7 @@ export function BeforeAfterSection() {
         </Reveal>
         <Reveal delay={2}>
           <div style={{ marginTop: 64 }}>
-            <BeforeAfterSlider />
+            <BeforeAfterSlider pct={pct} setPct={setPct} />
           </div>
         </Reveal>
       </div>
